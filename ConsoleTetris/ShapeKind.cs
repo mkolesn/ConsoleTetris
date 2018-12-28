@@ -5,6 +5,7 @@
     /// </summary>
     enum ShapeKind
     {
+        Empty,
         GLeft = 1,      // Г правая
         GRight = 2,     // Г левая
         SnakeLeft = 3,  // змейка вправо
