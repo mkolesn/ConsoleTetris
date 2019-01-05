@@ -6,14 +6,10 @@ using System.Threading.Tasks;
 
 namespace ConsoleTetris
 {
-    enum GameCommand : sbyte
+    enum InterfaceLanguage : byte
     {
-        NoCommand,
-        MoveLeft,
-        MoveRight,
-        Rotate,
-        MoveDown,
-        Land,
-        QuitToMenu
+        English = 1,
+        Ukrainian = 2,
+        Russian = 3
     }
 }

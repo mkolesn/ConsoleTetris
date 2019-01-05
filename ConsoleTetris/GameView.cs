@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleTetris
 {
@@ -11,6 +7,7 @@ namespace ConsoleTetris
     /// </summary>
     struct GameView
     {
+        // TODO Выделить тип Window или RectangularArea, и переделать вызовы методов рисования полей на него
         public int GameFieldLeft;
         public int GameFieldTop;
         public int NextShapeFieldLeft;
@@ -19,11 +16,10 @@ namespace ConsoleTetris
         public int ScoreTop;
         public int LevelLeft;
         public int LevelTop;
-        public int GameQuantum;
-        public int[] LevelDelay;
+        public ConsoleColor[] ShapeColors;
 
         public GameView(int gameFieldLeft, int gameFieldTop, int nextShapeFieldLeft, int nextShapeFieldTop,
-            int scoreLeft, int scoreTop, int levelLeft, int levelTop, int gameQuantum, int[] levelDelay)
+            int scoreLeft, int scoreTop, int levelLeft, int levelTop, ConsoleColor[] shapeColors)
         {
             GameFieldLeft = gameFieldLeft;
             GameFieldTop = gameFieldTop;
@@ -33,8 +29,7 @@ namespace ConsoleTetris
             ScoreTop = scoreTop;
             LevelLeft = levelLeft;
             LevelTop = levelTop;
-            GameQuantum = gameQuantum;
-            LevelDelay = (int[])levelDelay.Clone();
+            ShapeColors = shapeColors;
         }
     }
 }

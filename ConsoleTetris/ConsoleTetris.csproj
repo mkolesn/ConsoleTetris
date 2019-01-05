@@ -48,6 +48,7 @@
     <Compile Include="GameMenu.cs" />
     <Compile Include="GameScore.cs" />
     <Compile Include="GameView.cs" />
+    <Compile Include="InterfaceLanguage.cs" />
     <Compile Include="MenuItem.cs" />
     <Compile Include="Point2D.cs" />
     <Compile Include="Program.cs" />

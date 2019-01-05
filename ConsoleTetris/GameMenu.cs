@@ -11,7 +11,6 @@ namespace ConsoleTetris
     /// </summary>
     enum GameMenu
     {
-        NoMenu,
         StartGame,
         ResumeGame,
         ShowHelp,

@@ -10,6 +10,9 @@ namespace ConsoleTetris
         const int POINT_WIDTH = 2; // ширина одной ячейки фигурки/ одной ячейки игрового поля
         const int POINT_HEIGHT = 1; // высота одной ячейки фигурки/ одной ячейки игрового поля
         const string POINT = "\u2588\u2588"; // залитый квадрат для отображения одной ячейки игрового поля / фигуры // (char)0x + (char)0x2588; // 
+        const int SCORE_DIGITS = 6; // число знаков при выводе счёта
+        const int LEVEL_DIGITS = 2; // число знаков при выводе уровня
+        static TimeSpan MAX_DELAY = new TimeSpan(0, 0, 10);
 
         internal static void Initialize(int screenWidth, int screenHeight)
         {
@@ -17,66 +20,29 @@ namespace ConsoleTetris
             Console.SetWindowSize(screenWidth, screenHeight);
         }
 
-        internal static void StartGame(ref Game game, GameView view)
+        /// <summary>
+        /// Если появился пользовательский ввод, то вернуть истину и команду, которую ввёл пользователь
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static bool HasUserInput(out GameCommand command)
         {
-            //BL.InitializeGame(ref game);
-            PlayGame(ref game, view);
-        }
-
-        private static void PlayGame(ref Game game, GameView view)
-        {
-            Console.Clear();
-            UI.DrawScore(game, view);
-            UI.DrawField(view.GameFieldLeft, view.GameFieldTop, game.Field);
-
-            // Game Loop
-            GameCommand command;
-            bool quit = false;
-
-            do
+            if(Console.KeyAvailable)
             {
-                if (Console.KeyAvailable)
-                {
-                    command = TranslateCommand(Console.ReadKey(true).Key);
+                command = TranslateCommand(Console.ReadKey(true).Key);
+            }
+            else {
+                command = GameCommand.NoCommand;
+            }
 
-                    switch (command)
-                    {
-                        case GameCommand.NoCommand:
-                            break;
-                        case GameCommand.MoveLeft:
-                            break;
-                        case GameCommand.MoveRight:
-                            break;
-                        case GameCommand.MoveDown:
-                            break;
-                        case GameCommand.Land:
-                            break;
-                        case GameCommand.QuitToMenu:
-                            quit = true;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                /*
-                if (TimeToFall())
-                {
-                    Shape newShape = BL.MoveShape();
-                }
-                */
-
-                System.Threading.Thread.Sleep(view.GameQuantum);
-
-            } while (!quit);
-            throw new NotImplementedException();
+            return (command != GameCommand.NoCommand);
         }
 
-        internal static void ResumeGame(ref Game game, GameView view)
-        {
-            PlayGame(ref game, view);
-        }
-
+        /// <summary>
+        /// Преобразовать ввод пользователя в команду игры
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         static GameCommand TranslateCommand(ConsoleKey key)
         {
             GameCommand command;
@@ -95,6 +61,9 @@ namespace ConsoleTetris
                 case ConsoleKey.RightArrow:
                     command = GameCommand.MoveRight;
                     break;
+                case ConsoleKey.UpArrow:
+                    command = GameCommand.Rotate;
+                    break;
                 case ConsoleKey.DownArrow:
                     command = GameCommand.MoveDown;
                     break;
@@ -112,7 +81,7 @@ namespace ConsoleTetris
 
             DateTime d = DateTime.Now;
             TimeSpan ts = new TimeSpan(0, 0, 1);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.White;
 
             // Показываем стартовый экран на протяжении заданного интервала либо до нажатия клавиши
             // Если передали нулевой интервал, то выходим только по нажатию клавиши
@@ -120,15 +89,15 @@ namespace ConsoleTetris
             {
 
                 Console.WriteLine("ConsoleTetris Game SplashScreen");
-                if(Console.ForegroundColor == ConsoleColor.White)
+                if(Console.ForegroundColor == ConsoleColor.DarkBlue)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    Console.ForegroundColor = ConsoleColor.White;
                     Console.SetCursorPosition(0, 0);
                     Console.Clear();
                 }
                 else
                 {
-                    Console.ForegroundColor++;
+                    Console.ForegroundColor--;
                 }
                 System.Threading.Thread.Sleep(ts);
             } while((delaySeconds == 0 || d.AddSeconds(delaySeconds) > DateTime.Now)
@@ -152,6 +121,7 @@ namespace ConsoleTetris
             Console.WriteLine("\nУПРАВЛЕНИЕ");
             Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine("Стрелки влево и вправо - двигать фигуру влево/вправо");
+            Console.WriteLine("Стрелка вверх - повернуть фигуру на 90 градусов по часовой стрелке");
             Console.WriteLine("Стрелка вниз - ускорение падения фигуры");
             Console.WriteLine("Пробел - опустить фигуру до предела");
             Console.WriteLine("Esc - поставить игру на паузу и выйти в основное меню");
@@ -165,6 +135,33 @@ namespace ConsoleTetris
         internal static void ShowCredits()
         {
             ShowSplashScreen();
+        }
+
+        internal static void ShowGameOver(GameView view, Game game)
+        {
+            string s1 = "G A M E";
+            string s2 = "O V E R";
+
+            int left = view.GameFieldLeft + game.Field.Width * POINT_WIDTH / 2 - s1.Length / 2;
+            int top = view.GameFieldTop + game.Field.Height * POINT_HEIGHT / 2;
+            //DrawBorder(view.GameFieldLeft, view.GameFieldTop + game.Field.Height * POINT_HEIGHT / 2, s1.Length + 2, 4, ConsoleColor.Red);
+            DrawBorder(left, top, s1.Length + 2, 4, ConsoleColor.Red);
+            Console.SetCursorPosition(left + 1, top + 1);
+            Console.Write(s1);
+            Console.SetCursorPosition(left + 1, top + 2);
+            Console.Write(s2);
+
+            DateTime start = DateTime.Now;
+
+            do
+            {
+                System.Threading.Thread.Sleep(1);
+                if (Console.KeyAvailable)
+                {
+                    Console.ReadKey(true);
+                    break;
+                }
+            } while (DateTime.Now < (start + MAX_DELAY));
         }
 
         internal static void ShowMenu(MenuItem[] menu, int currentItem)
@@ -289,7 +286,17 @@ namespace ConsoleTetris
             currentItem = newCurrent;
         }
 
-        public static void DrawField(int left, int top, GameField field)
+        public static void DrawNextShapeField(GameView view, Game g)
+        {
+            DrawField(view.NextShapeFieldLeft, view.NextShapeFieldTop, g.NextShapeField, view);
+        }
+
+        public static void DrawPlayField(GameView view, Game g)
+        {
+            DrawField(view.GameFieldLeft, view.GameFieldTop, g.Field, view);
+        }
+
+        public static void DrawField(int left, int top, GameField field, GameView view)
         {
             DrawBorder(left, top, field.Width * POINT_WIDTH, field.Height * POINT_HEIGHT, ConsoleColor.White);
 
@@ -297,44 +304,15 @@ namespace ConsoleTetris
             {
                 for(int deltaY = 0; deltaY < field.Points.GetLength(1); deltaY++)
                 {
-                    DrawPoint(left + deltaX, top + deltaY, field.Points[deltaX, deltaY]);
+                    DrawPoint(left + deltaX * POINT_WIDTH, top + deltaY * POINT_HEIGHT, view.ShapeColors[(int)field.Points[deltaX, deltaY]] );
                 }
             }
         }
 
-        private static void DrawPoint(int x, int y, ShapeKind shapeKind)
+        private static void DrawPoint(int x, int y, ConsoleColor color)
         {
-            Console.SetCursorPosition(x * POINT_WIDTH, y * POINT_HEIGHT);
-            switch(shapeKind)
-            {
-                case ShapeKind.Empty:
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    break;
-                case ShapeKind.GLeft:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-                case ShapeKind.GRight:
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    break;
-                case ShapeKind.SnakeLeft:
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    break;
-                case ShapeKind.SnakeRight:
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    break;
-                case ShapeKind.Square:
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    break;
-                case ShapeKind.Strait:
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    break;
-                case ShapeKind.TLetter:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                default:
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    break;
-            }
+            Console.SetCursorPosition(x, y);
+            Console.ForegroundColor = color;
             Console.Write(POINT);
         }
 
@@ -345,27 +323,68 @@ namespace ConsoleTetris
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <param name="consoleColor"></param>
-        public static void DrawBorder(int left, int top, int width, int height, ConsoleColor consoleColor)
+        private static void DrawBorder(int left, int top, int width, int height, ConsoleColor borderColor)
         {
-            throw new NotImplementedException();
-        }
+            int padWidth = 1 + width; // один символ левой рамки плюс width символов горизонтальной рамки
+            string up = "\u2554".PadRight(padWidth, '\u2550') + '\u2557';
+            string middle = "\u2551".PadRight(padWidth) + '\u2551';
+            string bottom = "\u255A".PadRight(padWidth, '\u2550') + '\u255D';
 
-        public static void DrawScore(Game game, GameView view)
-        {
-            throw new NotImplementedException();
-        }
+            Console.ForegroundColor = borderColor;
 
+            Console.SetCursorPosition(left - 1, top - 1);
+            Console.WriteLine(up);
 
-        static void DrawShape(Shape shape)
-        {
-            for(int i = 0; i < shape.Points.Length; i++)
+            for (int i = 0; i < height; i++)
             {
-                DrawPoint(shape.Position.Left + shape.Points[i].Left, shape.Position.Top + shape.Points[i].Top, shape.Kind);
+                Console.SetCursorPosition(left - 1, Console.CursorTop);
+                Console.WriteLine(middle);
+            }
+
+            Console.SetCursorPosition(left - 1, Console.CursorTop);
+            Console.WriteLine(bottom);
+        }
+
+        public static void DrawScore(GameView view, Game game)
+        {
+            DrawBorder(view.ScoreLeft, view.ScoreTop, 14, 2, ConsoleColor.Cyan);
+            Console.SetCursorPosition(view.ScoreLeft, view.ScoreTop);
+            Console.Write("SCORE:{0}", game.Score.Score);
+            Console.SetCursorPosition(view.LevelLeft, view.LevelTop);
+            Console.Write("LEVEL:{0}", game.Score.Level);
+        }
+
+        public static void DrawCurrentShape(GameView view, Game g)
+        {
+            DrawShape(view, view.GameFieldLeft, view.GameFieldTop, g.CurrentShape);
+        }
+
+        public static void DrawNextShape(GameView view, Game g)
+        {
+            DrawShape(view, view.NextShapeFieldLeft, view.NextShapeFieldTop, g.NextShape);
+        }
+
+        internal static void ClearNextShape(GameView view, Game g)
+        {
+            DrawShape(view, view.NextShapeFieldLeft, view.NextShapeFieldTop, g.NextShape, true);
+        }
+
+        private static void DrawShape(GameView view, int fieldLeft, int fieldTop, Shape shape, bool clear = false)
+        {
+            ShapeKind kind = clear ? ShapeKind.Empty : shape.Kind;
+            ConsoleColor color = view.ShapeColors[(int) kind];
+
+            for (int i = 0; i < shape.Points.Length; i++)
+            {
+                int left = fieldLeft + (shape.Position.Left + shape.Points[i].Left) * POINT_WIDTH;
+                int top = fieldTop + (shape.Position.Top + shape.Points[i].Top) * POINT_HEIGHT;
+                DrawPoint(left, top, color);
             }
         }
 
-        static void DrawModifiedShape(Shape oldShape, Shape newShape)
+        /*static void DrawModifiedShape(GameView view, Shape oldShape, Shape newShape)
         {
+            // там, где нужно реализовать перемещение фигуры, разделить BL & UI, задействовать метод BL.SubtractPointSet - двойной вызов New minus Old & Old minus New
             Point2D[] oldPoints = (Point2D[])oldShape.Points.Clone();
             Point2D[] newPoints = (Point2D[])newShape.Points.Clone();
 
@@ -400,7 +419,7 @@ namespace ConsoleTetris
 
                 if(pointChanged)
                 {
-                    UI.DrawPoint(oldPoints[old].Left, oldPoints[old].Top, ShapeKind.Empty);
+                    UI.DrawPoint(view, oldPoints[old].Left, oldPoints[old].Top, ShapeKind.Empty);
                 }
             }
 
@@ -421,11 +440,29 @@ namespace ConsoleTetris
 
                 if(pointChanged)
                 {
-                    UI.DrawPoint(newPoints[new2].Left, newPoints[new2].Top, newShape.Kind);
+                    UI.DrawPoint(view, newPoints[new2].Left, newPoints[new2].Top, newShape.Kind);
                 }
             }
 
+        }*/
+
+        internal static void DrawPoints(Point2D[] points, ShapeKind kind, GameView view)
+        {
+            for(int i = 0; i < points.Length; i++)
+            {
+                DrawPoint(view.GameFieldLeft + points[i].Left * POINT_WIDTH, view.GameFieldLeft + points[i].Top * POINT_HEIGHT, view.ShapeColors[(int)kind]);
+            }
         }
 
+        internal static void DrawRows(int firstRow, int lastRow, GameField field, GameView view)
+        {
+            for(int row = lastRow; row < firstRow; row++)
+            {
+                for(int column = 0; column < field.Width; column++)
+                {
+                    DrawPoint(view.GameFieldLeft + column * POINT_WIDTH, view.GameFieldLeft + row * POINT_HEIGHT, view.ShapeColors[(int)field.Points[column, row]]);
+                }
+            }
+        }
     }
 }
