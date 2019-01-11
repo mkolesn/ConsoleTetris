@@ -167,41 +167,6 @@ namespace ConsoleTetris
             ShowSplashScreen();
         }
 
-
-        /// <summary>
-        /// Вывести меню на экран
-        /// </summary>
-        /// <param name="menu">Массив пунктов меню</param>
-        /// <param name="currentItem">Выбранный пункт меню</param>
-        private static void ShowMenu(MenuItem[] menu, int currentItem)
-        {
-
-            Console.SetCursorPosition(MENU_LEFT, MENU_TOP);
-
-            for(int i = 0; i < menu.Length; i++)
-            {
-                if(i == currentItem)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                }
-                else
-                {
-                    if(menu[i].Enabled)
-                    {
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                    }
-                }
-
-                Console.CursorLeft = MENU_LEFT;
-                Console.WriteLine(menu[i].Text);
-                Console.WriteLine();
-            }
-        }
-
         /// <summary>
         /// Вывести на экран меню и обработать пользовательский выбор пункта меню
         /// </summary>
@@ -245,6 +210,40 @@ namespace ConsoleTetris
             } while(!itemConfirm);
 
             return menu[currentItem].Value;
+        }
+
+        /// <summary>
+        /// Вывести меню на экран
+        /// </summary>
+        /// <param name="menu">Массив пунктов меню</param>
+        /// <param name="currentItem">Выбранный пункт меню</param>
+        private static void ShowMenu(MenuItem[] menu, int currentItem)
+        {
+
+            Console.SetCursorPosition(MENU_LEFT, MENU_TOP);
+
+            for (int i = 0; i < menu.Length; i++)
+            {
+                if (i == currentItem)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+                else
+                {
+                    if (menu[i].Enabled)
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    }
+                }
+
+                Console.CursorLeft = MENU_LEFT;
+                Console.WriteLine(menu[i].Text);
+                Console.WriteLine();
+            }
         }
 
         /// <summary>
@@ -294,7 +293,6 @@ namespace ConsoleTetris
 
             currentItem = newCurrent;
         }
-
 
         /// <summary>
         /// Отобразить сообщение "Игра окончена"
@@ -363,72 +361,6 @@ namespace ConsoleTetris
         }
 
         /// <summary>
-        ///  Вывести заданное поле и его содержимое на экран
-        /// </summary>
-        /// <param name="left">Левая координата экрана</param>
-        /// <param name="top">Верхняя координата экрана</param>
-        /// <param name="field">Поле для вывода</param>
-        /// <param name="view">Свойства пользовательского интерфейса</param>
-        private static void DrawField(int left, int top, GameField field, GameView view)
-        {
-            DrawBorder(left, top, field.Width * POINT_WIDTH, field.Height * POINT_HEIGHT, ConsoleColor.White);
-
-            for(int deltaX = 0; deltaX < field.Points.GetLength(0); deltaX++)
-            {
-                for(int deltaY = 0; deltaY < field.Points.GetLength(1); deltaY++)
-                {
-                    DrawPoint(left + deltaX * POINT_WIDTH, top + deltaY * POINT_HEIGHT, view.ShapeColors[(int)field.Points[deltaX, deltaY]] );
-                }
-            }
-        }
-
-        /// <summary>
-        /// Вывести на экран одну "точку" игрового поля
-        /// </summary>
-        /// <param name="x">Левая координата точки</param>
-        /// <param name="y">Верхняя координата точки</param>
-        /// <param name="color">Цвет точки</param>
-        private static void DrawPoint(int x, int y, ConsoleColor color)
-        {
-            for (int i = 0; i < POINT_HEIGHT; i++)
-            {
-                Console.SetCursorPosition(x, y + i);
-                Console.ForegroundColor = color;
-                Console.Write(POINT);
-            }
-        }
-
-        /// <summary>
-        /// Нарисовать рамку вокруг заданной области экрана
-        /// </summary>
-        /// <param name="left">Левая координата поля</param>
-        /// <param name="top">Верхняя координата поля</param>
-        /// <param name="width">Ширина поля</param>
-        /// <param name="height">Высота поля</param>
-        /// <param name="borderColor">Цвет рамки</param>
-        private static void DrawBorder(int left, int top, int width, int height, ConsoleColor borderColor)
-        {
-            int padWidth = 1 + width; // один символ левого угла рамки плюс width символов горизонтальной рамки
-            string up = "\u2554".PadRight(padWidth, '\u2550') + '\u2557';
-            string middle = "\u2551".PadRight(padWidth) + '\u2551';
-            string bottom = "\u255A".PadRight(padWidth, '\u2550') + '\u255D';
-
-            Console.ForegroundColor = borderColor;
-
-            Console.SetCursorPosition(left - 1, top - 1);
-            Console.WriteLine(up);
-
-            for (int i = 0; i < height; i++)
-            {
-                Console.SetCursorPosition(left - 1, Console.CursorTop);
-                Console.WriteLine(middle);
-            }
-
-            Console.SetCursorPosition(left - 1, Console.CursorTop);
-            Console.WriteLine(bottom);
-        }
-
-        /// <summary>
         /// Вывести массив точек на игровом поле
         /// </summary>
         /// <param name="points">Массив точек для отрисовки</param>
@@ -466,6 +398,72 @@ namespace ConsoleTetris
         public static void ClearNextShape(GameView view, Game g)
         {
             DrawShape(view, view.NextShapeFieldLeft, view.NextShapeFieldTop, g.NextShape, true);
+        }
+
+        /// <summary>
+        ///  Вывести заданное поле и его содержимое на экран
+        /// </summary>
+        /// <param name="left">Левая координата экрана</param>
+        /// <param name="top">Верхняя координата экрана</param>
+        /// <param name="field">Поле для вывода</param>
+        /// <param name="view">Свойства пользовательского интерфейса</param>
+        private static void DrawField(int left, int top, GameField field, GameView view)
+        {
+            DrawBorder(left, top, field.Width * POINT_WIDTH, field.Height * POINT_HEIGHT, ConsoleColor.White);
+
+            for (int deltaX = 0; deltaX < field.Points.GetLength(0); deltaX++)
+            {
+                for (int deltaY = 0; deltaY < field.Points.GetLength(1); deltaY++)
+                {
+                    DrawPoint(left + deltaX * POINT_WIDTH, top + deltaY * POINT_HEIGHT, view.ShapeColors[(int)field.Points[deltaX, deltaY]]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Вывести на экран одну "точку" игрового поля
+        /// </summary>
+        /// <param name="x">Левая координата точки</param>
+        /// <param name="y">Верхняя координата точки</param>
+        /// <param name="color">Цвет точки</param>
+        private static void DrawPoint(int x, int y, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            for (int i = 0; i < POINT_HEIGHT; i++)
+            {
+                Console.SetCursorPosition(x, y + i);
+                Console.Write(POINT);
+            }
+        }
+
+        /// <summary>
+        /// Нарисовать рамку вокруг заданной области экрана
+        /// </summary>
+        /// <param name="left">Левая координата поля</param>
+        /// <param name="top">Верхняя координата поля</param>
+        /// <param name="width">Ширина поля</param>
+        /// <param name="height">Высота поля</param>
+        /// <param name="borderColor">Цвет рамки</param>
+        private static void DrawBorder(int left, int top, int width, int height, ConsoleColor borderColor)
+        {
+            int padWidth = 1 + width; // один символ левого угла рамки плюс width символов горизонтальной рамки
+            string up = "\u2554".PadRight(padWidth, '\u2550') + '\u2557';
+            string middle = "\u2551".PadRight(padWidth) + '\u2551';
+            string bottom = "\u255A".PadRight(padWidth, '\u2550') + '\u255D';
+
+            Console.ForegroundColor = borderColor;
+
+            Console.SetCursorPosition(left - 1, top - 1);
+            Console.WriteLine(up);
+
+            for (int i = 0; i < height; i++)
+            {
+                Console.SetCursorPosition(left - 1, Console.CursorTop);
+                Console.WriteLine(middle);
+            }
+
+            Console.SetCursorPosition(left - 1, Console.CursorTop);
+            Console.WriteLine(bottom);
         }
 
         private static void DrawShape(GameView view, int fieldLeft, int fieldTop, Shape shape, bool clear = false)
