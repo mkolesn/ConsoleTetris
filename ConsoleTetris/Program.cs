@@ -2,32 +2,39 @@
 
 namespace ConsoleTetris
 {
+    /// <summary>
+    /// ConsoleTetris - a Tetris game
+    /// https://github.com/mkolesn/ConsoleTetris
+    /// </summary>
     class Program
     {
         // TODO Добавлять ко всем типам и методам xml-комментарии
         // TODO Добавить английское и украинское меню и выбор языка при запуске программы (добавил enum InterfaceLanguage)
 
-        const int SPLASH_SCREEN_DELAY = 5; // сколько времени показывать стартовый экран
         const int FIELD_WIDTH = 10;
         const int FIELD_HEIGHT = 20;
         const int NEXT_SHAPE_FIELD_WIDTH = 7;
         const int NEXT_SHAPE_FIELD_HEIGHT = 7;
 
         const int SCREEN_WIDTH = 80;
-        const int SCREEN_HEIGHT = 30;
-
+        const int SCREEN_HEIGHT = 50;
         const int GAME_FIELD_LEFT = 1;
-        const int GAME_FIELD_TOP = 1;
-        const int NEXT_SHAPE_FIELD_LEFT = 24;
-        const int NEXT_SHAPE_FIELD_TOP = 1;
-        const int SCORE_LEFT = 24;
-        const int SCORE_TOP = 10;
-        const int LEVEL_LEFT = 24;
-        const int LEVEL_TOP = 11;
+        const int GAME_FIELD_TOP = 2;
+        const int NEXT_SHAPE_FIELD_LEFT = 48;
+        const int NEXT_SHAPE_FIELD_TOP = GAME_FIELD_TOP;
+        const int SCORE_LEFT = NEXT_SHAPE_FIELD_LEFT;
+        const int SCORE_TOP = 22;
+        const int LEVEL_LEFT = NEXT_SHAPE_FIELD_LEFT;
+        const int LEVEL_TOP = 23;
+
+        const int SPLASH_SCREEN_DELAY = 5; // сколько времени показывать стартовый экран
         const int GAME_QUANTUM = 5; // минимальный квант времени в игре. в миллисекундах
         const int FALL_ANIMATE_QUANTUM = 300;
-        static int[] LEVEL_SCORE = { 0, 1000, 3000 }; // количество очков, при котором происходит переход на новый уровень
-        static TimeSpan[] LEVEL_DELAY = { new TimeSpan(0, 0, 0, 0, 600),
+        static int[] LEVEL_SCORE = { 0, 2000, 4000, 7000, 11000, 15000 }; // количество очков, при котором происходит переход на новый уровень
+        static TimeSpan[] LEVEL_DELAY = { new TimeSpan(0, 0, 0, 1, 100),
+                                           new TimeSpan(0, 0, 0, 0, 900),
+                                           new TimeSpan(0, 0, 0, 0, 700),
+                                           new TimeSpan(0, 0, 0, 0, 500),
                                            new TimeSpan(0, 0, 0, 0, 300),
                                            new TimeSpan(0, 0, 0, 0, 200)}; // величина задержки между автоматическими падениями фигуры (миллисекунды)
 
@@ -41,8 +48,6 @@ namespace ConsoleTetris
 #if !DEBUG
             UI.ShowSplashScreen(SPLASH_SCREEN_DELAY);
 #endif
-            //int[] levelScore = { 0, 1000, 3000 }; // количество очков, при котором происходит переход на новый уровень
-            //int[] levelDelay = { 300, 200, 125 }; // величина задержки между автоматическими падениями фигуры. в миллисекунах
             ConsoleColor[] shapeColors = { ConsoleColor.Black, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Cyan, ConsoleColor.Blue, ConsoleColor.Magenta, ConsoleColor.DarkYellow, ConsoleColor.Red }; // цвета фигур
 
             Game game = BL.InitializeGame(FIELD_WIDTH, FIELD_HEIGHT, NEXT_SHAPE_FIELD_WIDTH, NEXT_SHAPE_FIELD_HEIGHT);
@@ -68,6 +73,10 @@ namespace ConsoleTetris
                         {
                             UI.ShowGameOver(view, game);
                         }
+                        else
+                        {
+                            currentItem = (int)GameMenu.ResumeGame; // если игра не завершена, то переключаемся на пункт GameMenu.ResumeGame
+                        }
                         break;
 
                     case GameMenu.ResumeGame:
@@ -75,6 +84,7 @@ namespace ConsoleTetris
                         menu[(int)GameMenu.ResumeGame].Enabled = !gameOver;
                         if (gameOver)
                         {
+                            currentItem = (int)GameMenu.StartGame; // в завершённую игру запрещено возвращаться. переключаемся на пункт GameMenu.StartGame
                             UI.ShowGameOver(view, game);
                         }
                         break;
@@ -120,12 +130,18 @@ namespace ConsoleTetris
                     int[] filledRows;
 
                     BL.AppendShape(game.CurrentShape, game.Field, out minShapeRow, out maxShapeRow);
-                    // TODO Отладить расчёт очков и т.п.
+
                     if (BL.HasFilledRows(minShapeRow, maxShapeRow, game.Field, out filledRows))
                     {
                         game.Score.Score += BL.CalcScore(filledRows.Length);
+                        if(game.Score.Level < (LEVEL_SCORE.Length - 1) && game.Score.Score >= LEVEL_SCORE[game.Score.Level + 1])
+                        {
+                            ++game.Score.Level;
+                        }
 
-                        int firstRowToFall = BL.FirstEmptyRow(game.Field, filledRows[0]) + 1;
+                        UI.DrawScore(view, game);
+
+                        int firstRowToFall = BL.FirstEmptyRow(game.Field, filledRows[0] == 0 ? filledRows[0] : filledRows[0] - 1) + 1;
 
                         for (int i = 0; i < filledRows.Length; i++)
                         {

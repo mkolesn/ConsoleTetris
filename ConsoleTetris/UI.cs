@@ -7,14 +7,22 @@ namespace ConsoleTetris
     {
         const int MENU_LEFT = 10;
         const int MENU_TOP = 10;
-        const int POINT_WIDTH = 2; // ширина одной ячейки фигурки/ одной ячейки игрового поля
-        const int POINT_HEIGHT = 1; // высота одной ячейки фигурки/ одной ячейки игрового поля
-        const string POINT = "\u2588\u2588"; // залитый квадрат для отображения одной ячейки игрового поля / фигуры // (char)0x + (char)0x2588; // 
+
+        const int POINT_WIDTH = 4; // ширина одной ячейки фигурки/ одной ячейки игрового поля
+        const int POINT_HEIGHT = 2; // высота одной ячейки фигурки/ одной ячейки игрового поля
+        //const string POINT = "\u2588\u2588"; // залитый квадрат для отображения одной ячейки игрового поля / фигуры // (char)0x + (char)0x2588; // 
+        const string POINT = "\u2588\u2588\u2588\u2588"; // залитый квадрат для отображения одной ячейки игрового поля / фигуры // (char)0x + (char)0x2588; // 
+
         const int SCORE_DIGITS = 6; // число знаков при выводе счёта
         const int LEVEL_DIGITS = 2; // число знаков при выводе уровня
         static TimeSpan MAX_DELAY = new TimeSpan(0, 0, 10);
 
-        internal static void Initialize(int screenWidth, int screenHeight)
+        /// <summary>
+        /// Инициализировать приложение
+        /// </summary>
+        /// <param name="screenWidth">Ширина экрана консоли</param>
+        /// <param name="screenHeight">Высота экрана консоли</param>
+        public static void Initialize(int screenWidth, int screenHeight)
         {
             Console.CursorVisible = false;
             Console.SetWindowSize(screenWidth, screenHeight);
@@ -23,8 +31,8 @@ namespace ConsoleTetris
         /// <summary>
         /// Если появился пользовательский ввод, то вернуть истину и команду, которую ввёл пользователь
         /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
+        /// <param name="command">Проинтерпретированный ввод команды пользователя</param>
+        /// <returns>Признак, что получен пользовательский ввод</returns>
         public static bool HasUserInput(out GameCommand command)
         {
             if(Console.KeyAvailable)
@@ -41,9 +49,9 @@ namespace ConsoleTetris
         /// <summary>
         /// Преобразовать ввод пользователя в команду игры
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        static GameCommand TranslateCommand(ConsoleKey key)
+        /// <param name="key">Нажатая клавиша</param>
+        /// <returns>Команда, соответствующая заданной клавише</returns>
+        private static GameCommand TranslateCommand(ConsoleKey key)
         {
             GameCommand command;
 
@@ -75,7 +83,11 @@ namespace ConsoleTetris
             return command;
         }
 
-        internal static void ShowSplashScreen(int delaySeconds = 0)
+        /// <summary>
+        /// Показать заставку
+        /// </summary>
+        /// <param name="delaySeconds">Время показа заставки в секундах. Если равно ноль, то показывать до тех пор, пока пользователь не нажмёт любую клавишу</param>
+        public static void ShowSplashScreen(int delaySeconds = 0)
         {
             Console.Clear();
 
@@ -109,13 +121,28 @@ namespace ConsoleTetris
             }
         }
 
-        internal static void ShowHelp()
+        /// <summary>
+        /// Вывести на экран справку игры
+        /// </summary>
+        public static void ShowHelp()
         {
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("ПРАВИЛА");
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.WriteLine("Случайные фигурки тетрамино падают сверху в прямоугольный стакан шириной 10 и высотой 20 клеток. В полёте игрок может поворачивать фигурку на 90° и двигать её по горизонтали. Также можно «сбрасывать» фигурку, то есть ускорять её падение, когда уже решено, куда фигурка должна упасть. Фигурка летит до тех пор, пока не наткнётся на другую фигурку либо на дно стакана. Если при этом заполнился горизонтальный ряд из 10 клеток, он пропадает и всё, что выше него, опускается на одну клетку. Дополнительно показывается фигурка, которая будет следовать после текущей — это подсказка, которая позволяет игроку планировать действия. Темп игры постепенно увеличивается. Игра заканчивается, когда новая фигурка не может поместиться в стакан. Игрок получает очки за каждый заполненный ряд, поэтому его задача — заполнять ряды, не заполняя сам стакан (по вертикали) как можно дольше, чтобы таким образом получить как можно больше очков.");
+            Console.WriteLine("Случайные фигурки тетрамино падают сверху в прямоугольный стакан шириной 10");
+            Console.WriteLine("и высотой 20 клеток. В полёте игрок может поворачивать фигурку на 90°");
+            Console.WriteLine("и двигать её по горизонтали. Также можно «сбрасывать» фигурку, то есть");
+            Console.WriteLine("ускорять её падение, когда уже решено, куда фигурка должна упасть.");
+            Console.WriteLine("Фигурка летит до тех пор, пока не наткнётся на другую фигурку либо");
+            Console.WriteLine("на дно стакана. Если при этом заполнился горизонтальный ряд из 10 клеток,");
+            Console.WriteLine("он пропадает и всё, что выше него, опускается на одну клетку.");
+            Console.WriteLine("Дополнительно показывается фигурка, которая будет следовать после текущей —");
+            Console.WriteLine("это подсказка, которая позволяет игроку планировать действия.");
+            Console.WriteLine("Темп игры постепенно увеличивается. Игра заканчивается, когда новая фигурка");
+            Console.WriteLine("не может поместиться в стакан. Игрок получает очки за каждый заполненный ряд,");
+            Console.WriteLine("поэтому его задача — заполнять ряды, не заполняя сам стакан (по вертикали)");
+            Console.WriteLine("как можно дольше, чтобы таким образом получить как можно больше очков.");
 
             Console.BackgroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("\nУПРАВЛЕНИЕ");
@@ -132,39 +159,21 @@ namespace ConsoleTetris
             Console.ReadKey(true);
         }
 
-        internal static void ShowCredits()
+        /// <summary>
+        /// Отобразить окно "О программе"
+        /// </summary>
+        public static void ShowCredits()
         {
             ShowSplashScreen();
         }
 
-        internal static void ShowGameOver(GameView view, Game game)
-        {
-            string s1 = "G A M E";
-            string s2 = "O V E R";
 
-            int left = view.GameFieldLeft + game.Field.Width * POINT_WIDTH / 2 - s1.Length / 2;
-            int top = view.GameFieldTop + game.Field.Height * POINT_HEIGHT / 2;
-            //DrawBorder(view.GameFieldLeft, view.GameFieldTop + game.Field.Height * POINT_HEIGHT / 2, s1.Length + 2, 4, ConsoleColor.Red);
-            DrawBorder(left, top, s1.Length + 2, 4, ConsoleColor.Red);
-            Console.SetCursorPosition(left + 1, top + 1);
-            Console.Write(s1);
-            Console.SetCursorPosition(left + 1, top + 2);
-            Console.Write(s2);
-
-            DateTime start = DateTime.Now;
-
-            do
-            {
-                System.Threading.Thread.Sleep(1);
-                if (Console.KeyAvailable)
-                {
-                    Console.ReadKey(true);
-                    break;
-                }
-            } while (DateTime.Now < (start + MAX_DELAY));
-        }
-
-        internal static void ShowMenu(MenuItem[] menu, int currentItem)
+        /// <summary>
+        /// Вывести меню на экран
+        /// </summary>
+        /// <param name="menu">Массив пунктов меню</param>
+        /// <param name="currentItem">Выбранный пункт меню</param>
+        private static void ShowMenu(MenuItem[] menu, int currentItem)
         {
 
             Console.SetCursorPosition(MENU_LEFT, MENU_TOP);
@@ -196,9 +205,9 @@ namespace ConsoleTetris
         /// <summary>
         /// Вывести на экран меню и обработать пользовательский выбор пункта меню
         /// </summary>
-        /// <param name="menu"></param>
-        /// <returns>выбранный пункт меню</returns>
-        internal static GameMenu GetMenuSelection(MenuItem[] menu, ref int currentItem)
+        /// <param name="menu">Массив пунктов меню</param>
+        /// <returns>Выбранный пункт меню</returns>
+        public static GameMenu GetMenuSelection(MenuItem[] menu, ref int currentItem)
         {
             bool itemConfirm = false;
 
@@ -241,8 +250,8 @@ namespace ConsoleTetris
         /// <summary>
         /// Сделать текущим следующий не запрещённый пункт меню. Меню цикличное
         /// </summary>
-        /// <param name="menu"></param>
-        /// <param name="currentItem"></param>
+        /// <param name="menu">Массив пунктов меню</param>
+        /// <param name="currentItem">Выбранный пункт меню</param>
         private static void SelectPreviousMenuItem(MenuItem[] menu, ref int currentItem)
         {
             int newCurrent = currentItem;
@@ -265,8 +274,8 @@ namespace ConsoleTetris
         /// <summary>
         /// Сделать текущим предыдующий не запрещённый пункт меню. Меню цикличное
         /// </summary>
-        /// <param name="menu"></param>
-        /// <param name="currentItem"></param>
+        /// <param name="menu">Массив пунктов меню</param>
+        /// <param name="currentItem">Выбранный пункт меню</param>
         private static void SelectNextMenuItem(MenuItem[] menu, ref int currentItem)
         {
             int newCurrent = currentItem;
@@ -286,17 +295,81 @@ namespace ConsoleTetris
             currentItem = newCurrent;
         }
 
+
+        /// <summary>
+        /// Отобразить сообщение "Игра окончена"
+        /// </summary>
+        /// <param name="view">Свойства пользовательского интерфейса</param>
+        /// <param name="game">Свойства игры</param>
+        public static void ShowGameOver(GameView view, Game game)
+        {
+            string s1 = "G A M E";
+            string s2 = "O V E R";
+
+            int left = view.GameFieldLeft + game.Field.Width * POINT_WIDTH / 2 - s1.Length / 2;
+            int top = view.GameFieldTop + game.Field.Height * POINT_HEIGHT / 2;
+            //DrawBorder(view.GameFieldLeft, view.GameFieldTop + game.Field.Height * POINT_HEIGHT / 2, s1.Length + 2, 4, ConsoleColor.Red);
+            DrawBorder(left, top, s1.Length + 2, 4, ConsoleColor.Red);
+            Console.SetCursorPosition(left + 1, top + 1);
+            Console.Write(s1);
+            Console.SetCursorPosition(left + 1, top + 2);
+            Console.Write(s2);
+
+            DateTime start = DateTime.Now;
+
+            do
+            {
+                System.Threading.Thread.Sleep(1);
+                if (Console.KeyAvailable)
+                {
+                    Console.ReadKey(true);
+                    break;
+                }
+            } while (DateTime.Now < (start + MAX_DELAY));
+        }
+
+        /// <summary>
+        /// Вывести на экран Поле, отображающее следующую фигуру
+        /// </summary>
+        /// <param name="view">Свойства пользовательского интерфейса</param>
+        /// <param name="g">Свойства игры</param>
         public static void DrawNextShapeField(GameView view, Game g)
         {
             DrawField(view.NextShapeFieldLeft, view.NextShapeFieldTop, g.NextShapeField, view);
         }
 
+        /// <summary>
+        /// Вывести на экран Игровое поле
+        /// </summary>
+        /// <param name="view">Свойства пользовательского интерфейса</param>
+        /// <param name="g">Свойства игры</param>
         public static void DrawPlayField(GameView view, Game g)
         {
             DrawField(view.GameFieldLeft, view.GameFieldTop, g.Field, view);
         }
 
-        public static void DrawField(int left, int top, GameField field, GameView view)
+        /// <summary>
+        /// Вывести на экран Поле текущего счёта игры
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="game"></param>
+        public static void DrawScore(GameView view, Game game)
+        {
+            DrawBorder(view.ScoreLeft, view.ScoreTop, 14, 2, ConsoleColor.Cyan);
+            Console.SetCursorPosition(view.ScoreLeft, view.ScoreTop);
+            Console.Write("SCORE:{0}", game.Score.Score);
+            Console.SetCursorPosition(view.LevelLeft, view.LevelTop);
+            Console.Write("LEVEL:{0}", game.Score.Level);
+        }
+
+        /// <summary>
+        ///  Вывести заданное поле и его содержимое на экран
+        /// </summary>
+        /// <param name="left">Левая координата экрана</param>
+        /// <param name="top">Верхняя координата экрана</param>
+        /// <param name="field">Поле для вывода</param>
+        /// <param name="view">Свойства пользовательского интерфейса</param>
+        private static void DrawField(int left, int top, GameField field, GameView view)
         {
             DrawBorder(left, top, field.Width * POINT_WIDTH, field.Height * POINT_HEIGHT, ConsoleColor.White);
 
@@ -309,23 +382,33 @@ namespace ConsoleTetris
             }
         }
 
+        /// <summary>
+        /// Вывести на экран одну "точку" игрового поля
+        /// </summary>
+        /// <param name="x">Левая координата точки</param>
+        /// <param name="y">Верхняя координата точки</param>
+        /// <param name="color">Цвет точки</param>
         private static void DrawPoint(int x, int y, ConsoleColor color)
         {
-            Console.SetCursorPosition(x, y);
-            Console.ForegroundColor = color;
-            Console.Write(POINT);
+            for (int i = 0; i < POINT_HEIGHT; i++)
+            {
+                Console.SetCursorPosition(x, y + i);
+                Console.ForegroundColor = color;
+                Console.Write(POINT);
+            }
         }
 
         /// <summary>
-        ////Нарисовать рамку вокруг заданной области экрана
+        /// Нарисовать рамку вокруг заданной области экрана
         /// </summary>
-        /// <param name="point2D"></param>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <param name="consoleColor"></param>
+        /// <param name="left">Левая координата поля</param>
+        /// <param name="top">Верхняя координата поля</param>
+        /// <param name="width">Ширина поля</param>
+        /// <param name="height">Высота поля</param>
+        /// <param name="borderColor">Цвет рамки</param>
         private static void DrawBorder(int left, int top, int width, int height, ConsoleColor borderColor)
         {
-            int padWidth = 1 + width; // один символ левой рамки плюс width символов горизонтальной рамки
+            int padWidth = 1 + width; // один символ левого угла рамки плюс width символов горизонтальной рамки
             string up = "\u2554".PadRight(padWidth, '\u2550') + '\u2557';
             string middle = "\u2551".PadRight(padWidth) + '\u2551';
             string bottom = "\u255A".PadRight(padWidth, '\u2550') + '\u255D';
@@ -345,13 +428,29 @@ namespace ConsoleTetris
             Console.WriteLine(bottom);
         }
 
-        public static void DrawScore(GameView view, Game game)
+        /// <summary>
+        /// Вывести массив точек на игровом поле
+        /// </summary>
+        /// <param name="points">Массив точек для отрисовки</param>
+        /// <param name="kind">Тип фигуры. Нужен для определения цвета точек</param>
+        /// <param name="view">Свойства пользовательского интерфейса</param>
+        public static void DrawPoints(Point2D[] points, ShapeKind kind, GameView view)
         {
-            DrawBorder(view.ScoreLeft, view.ScoreTop, 14, 2, ConsoleColor.Cyan);
-            Console.SetCursorPosition(view.ScoreLeft, view.ScoreTop);
-            Console.Write("SCORE:{0}", game.Score.Score);
-            Console.SetCursorPosition(view.LevelLeft, view.LevelTop);
-            Console.Write("LEVEL:{0}", game.Score.Level);
+            for (int i = 0; i < points.Length; i++)
+            {
+                DrawPoint(view.GameFieldLeft + points[i].Left * POINT_WIDTH, view.GameFieldTop + points[i].Top * POINT_HEIGHT, view.ShapeColors[(int)kind]);
+            }
+        }
+
+        public static void DrawRows(int firstRow, int lastRow, GameField field, GameView view)
+        {
+            for (int row = lastRow; row >= firstRow; row--)
+            {
+                for (int column = 0; column < field.Width; column++)
+                {
+                    DrawPoint(view.GameFieldLeft + column * POINT_WIDTH, view.GameFieldTop + row * POINT_HEIGHT, view.ShapeColors[(int)field.Points[column, row]]);
+                }
+            }
         }
 
         public static void DrawCurrentShape(GameView view, Game g)
@@ -364,7 +463,7 @@ namespace ConsoleTetris
             DrawShape(view, view.NextShapeFieldLeft, view.NextShapeFieldTop, g.NextShape);
         }
 
-        internal static void ClearNextShape(GameView view, Game g)
+        public static void ClearNextShape(GameView view, Game g)
         {
             DrawShape(view, view.NextShapeFieldLeft, view.NextShapeFieldTop, g.NextShape, true);
         }
@@ -379,89 +478,6 @@ namespace ConsoleTetris
                 int left = fieldLeft + (shape.Position.Left + shape.Points[i].Left) * POINT_WIDTH;
                 int top = fieldTop + (shape.Position.Top + shape.Points[i].Top) * POINT_HEIGHT;
                 DrawPoint(left, top, color);
-            }
-        }
-
-        /*static void DrawModifiedShape(GameView view, Shape oldShape, Shape newShape)
-        {
-            // там, где нужно реализовать перемещение фигуры, разделить BL & UI, задействовать метод BL.SubtractPointSet - двойной вызов New minus Old & Old minus New
-            Point2D[] oldPoints = (Point2D[])oldShape.Points.Clone();
-            Point2D[] newPoints = (Point2D[])newShape.Points.Clone();
-
-            // переводим относительные координаты в координаты игрового поля
-            for (int i = 0; i < oldPoints.Length; i++)
-			{
-                oldPoints[i].Left += newShape.Position.Left;
-                oldPoints[i].Top += newShape.Position.Top;
-			}
-
-            // переводим относительные координаты в координаты игрового поля
-            for (int i = 0; i < newPoints.Length; i++)
-			{
-                newPoints[i].Left += oldShape.Position.Left;
-                newPoints[i].Top += oldShape.Position.Top;
-			}
-
-            // если точки старой фигуры отсутствуют в составе новой, то закрасить их пустым цветом
-            for(int old = 0; old < oldPoints.Length; old++)
-            {
-                bool pointChanged = true;
-
-                for(int new1 = 0; new1 < newPoints.Length; new1++)
-                {
-                    if(oldPoints[old].Left == newPoints[new1].Left
-                        && oldPoints[old].Top == newPoints[new1].Top)
-                    {
-                        pointChanged = false;
-                        break;
-                    }
-                }
-
-                if(pointChanged)
-                {
-                    UI.DrawPoint(view, oldPoints[old].Left, oldPoints[old].Top, ShapeKind.Empty);
-                }
-            }
-
-            // если точки новой фигуры отсутствуют в составе старой, то закрасить их пустым цветом
-            for(int new2 = 0; new2 < oldPoints.Length; new2++)
-            {
-                bool pointChanged = true;
-
-                for(int old1 = 0; old1 < oldPoints.Length; old1++)
-                {
-                    if(newPoints[new2].Left == oldPoints[old1].Left
-                        && newPoints[new2].Top == oldPoints[old1].Top)
-                    {
-                        pointChanged = false;
-                        break;
-                    }
-                }
-
-                if(pointChanged)
-                {
-                    UI.DrawPoint(view, newPoints[new2].Left, newPoints[new2].Top, newShape.Kind);
-                }
-            }
-
-        }*/
-
-        internal static void DrawPoints(Point2D[] points, ShapeKind kind, GameView view)
-        {
-            for(int i = 0; i < points.Length; i++)
-            {
-                DrawPoint(view.GameFieldLeft + points[i].Left * POINT_WIDTH, view.GameFieldLeft + points[i].Top * POINT_HEIGHT, view.ShapeColors[(int)kind]);
-            }
-        }
-
-        internal static void DrawRows(int firstRow, int lastRow, GameField field, GameView view)
-        {
-            for(int row = lastRow; row < firstRow; row++)
-            {
-                for(int column = 0; column < field.Width; column++)
-                {
-                    DrawPoint(view.GameFieldLeft + column * POINT_WIDTH, view.GameFieldLeft + row * POINT_HEIGHT, view.ShapeColors[(int)field.Points[column, row]]);
-                }
             }
         }
     }

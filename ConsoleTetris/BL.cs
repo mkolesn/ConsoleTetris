@@ -242,7 +242,7 @@ namespace ConsoleTetris
             int filledRowsCount = 0;
             filledRows = new int[maxShapeRow - minShapeRow + 1];
 
-            for (int row = minShapeRow; row < maxShapeRow; row++)
+            for (int row = minShapeRow; row <= maxShapeRow; row++)
             {
                 if (!RowHasEmpty(field, row))
                 {
@@ -418,7 +418,7 @@ namespace ConsoleTetris
 
         internal static void RemoveFilledRow(int firstRow, int lastRow, GameField field)
         {
-            for (int row = lastRow; row < firstRow; row++)
+            for (int row = lastRow; row >= firstRow; row--)
             {
                 for (int column = 0; column < field.Width; column++)
                 {
