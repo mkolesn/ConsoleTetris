@@ -46,7 +46,7 @@ namespace ConsoleTetris
         /// <returns></returns>
         private static ShapeKind GenerateShapeKind()
         {
-            return (ShapeKind)((rnd.Next() % (int)ShapeKind.TLetter) + 1);
+            return (ShapeKind)rnd.Next(1, (int)ShapeKind.TLetter + 1);
         }
 
         private static void SetShapeKind(ref Shape sh, ShapeKind kind)
@@ -301,17 +301,6 @@ namespace ConsoleTetris
             }
 
             return score;
-        }
-
-        internal static void RemoveRows(int[] filledRows, GameField field)
-        {
-            /*    int maxFilledRow = filledRows[filledRows.Length - 1];
-                int min
-                for (int column = 0; column < length; column++)
-                {
-
-                }*/
-            throw new NotImplementedException();
         }
 
         private static Shape CloneShape(Shape shape)
